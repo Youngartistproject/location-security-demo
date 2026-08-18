@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Security Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 50px auto; padding: 20px; line-height: 1.5; }
+    .card { border: 1px solid #ddd; border-radius: 14px; padding: 24px; box-shadow: 0 4px 16px #0001; }
+    button { padding: 12px 18px; border: 0; border-radius: 8px; cursor: pointer; font-size: 16px; }
+    #result { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; }
+    .warning { font-size: 14px; color: #555; }
+    a { word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📍 Location Security Demo</h1>
+    <p>
+      This is an educational demonstration of the browser Geolocation API.
+      Your location is requested only after you press the button and approve
+      the browser's permission prompt.
+    </p>
+
+    <button id="locate">Share my location</button>
+
+    <div id="result">Waiting for permission...</div>
+  </div>
+
+  <script>
+    const button = document.getElementById("locate");
+    const result = document.getElementById("result");
+
+    button.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        result.textContent = "Geolocation is not supported by this browser.";
+        return;
+      }
+
+      result.textContent = "Requesting location permission...";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude, accuracy } = position.coords;
+
+          result.innerHTML = `
+            <strong>Location received.</strong><br><br>
+            Latitude: ${latitude.toFixed(6)}<br>
+            Longitude: ${longitude.toFixed(6)}<br>
+            Accuracy: approximately ${Math.round(accuracy)} metres<br><br>
+            <a target="_blank"
+               href="https://www.google.com/maps?q=${latitude},${longitude}">
+               Open this location on a map
+            </a>
+          `;
+        },
+        (error) => {
+          if (error.code === 1) {
+            result.textContent =
+              "Location permission was denied. This is an important browser privacy protection.";
+          } else if (error.code === 2) {
+            result.textContent = "Your device could not determine a location.";
+          } else {
+            result.textContent = "The location request timed out.";
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
+  </script>
+</body>
+</html>
